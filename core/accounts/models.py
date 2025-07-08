@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from restaurants.models import Restaurant
 # Create your models here.
 
 
@@ -26,11 +27,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('manager', 'مدیر'),
         ('viewer', 'بیننده'),
     )
-
     email = models.EmailField(unique=True, verbose_name="ایمیل")
+    full_name = models.CharField(max_length=100, verbose_name="نام کامل", null=True, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='viewer', verbose_name="نقش")
-    # restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, null=True, blank=True)
-
+    restaurant = models.OneToOneField(
+        Restaurant,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='manager', 
+        verbose_name="رستوران"
+    )
     is_active = models.BooleanField(default=True, verbose_name="فعال")
     is_staff = models.BooleanField(default=False, verbose_name="کارمند")
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت نام")
@@ -40,8 +47,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = [] 
+    
     def __str__(self):
-        return f"{self.email}"
+        return f"{self.full_name}({self.email})"
     
 
     class Meta:
