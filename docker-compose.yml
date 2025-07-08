@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: elrondDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5433:5432"
+
+  elrond-backend:
+    build: .
+    container_name: elrond
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./core:/app
+    ports:
+      - "12000:8000"
+    environment:
+      - SECRET_KEY=test
+      - DEBUG=True
+    depends_on:
+      - db
