@@ -5,3 +5,4 @@ Pillow
 psycopg2-binary>=2.9.9
 django-filter>=23.5
 djangorestframework-simplejwt
+drf-spectacular
