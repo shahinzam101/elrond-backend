@@ -9,14 +9,14 @@ class RestaurantAdmin(admin.ModelAdmin):
 
 @admin.register(RestaurantProfile)
 class RestaurantProfileAdmin(admin.ModelAdmin):
-    list_display = ('restaurant', 'owner_name', "manager", 'contact_email', 'phone_number')
+    list_display = ('restaurant', 'owner_name', 'contact_email', 'phone_number')
     search_fields = ('restaurant__name', 'owner_name', 'phone_number')
     list_filter = ('restaurant__name',)
     readonly_fields = ('logo_preview',)
 
     fieldsets = (
         (None, {
-            'fields': ('restaurant', 'owner_name',  'manager' ,'contact_email', 'phone_number', 'address')
+            'fields': ('restaurant', 'owner_name', 'contact_email', 'phone_number', 'address')
         }),
         ("لوگو", {
             'fields': ('logo', 'logo_preview'),

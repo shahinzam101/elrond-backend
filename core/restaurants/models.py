@@ -11,14 +11,6 @@ class Restaurant(models.Model):
 class RestaurantProfile(models.Model):
     restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE, related_name="profile" , verbose_name= "رستوران" )
     owner_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="مالک")
-    manager = models.OneToOneField(
-        'accounts.CustomUser',
-        on_delete=models.CASCADE,
-        related_name='restaurant_profile',
-        verbose_name="مدیر",
-        blank=True,
-        null=True,
-    )
     contact_email = models.EmailField(blank=True, null=True, verbose_name="ایمیل")
     phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="تلفن")
     address = models.TextField(blank=True, null=True, verbose_name="آدرس")

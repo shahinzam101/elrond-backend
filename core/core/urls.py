@@ -30,6 +30,7 @@ SPECTACULAR_SETTINGS = {
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("restaurants/", include("restaurants.urls")),
+    path("accounts/", include("accounts.api.v1.urls")),
     #swagger links for the api documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # schema خام (JSON)
     path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

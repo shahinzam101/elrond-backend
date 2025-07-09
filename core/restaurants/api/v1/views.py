@@ -3,31 +3,61 @@ from restaurants.models import Restaurant, RestaurantProfile
 from .serializers import RestaurantProfileSerializer, RestaurantSerializer
 from .permissions import IsOwnerOrSuperuser
 
+from rest_framework import viewsets, filters
+from restaurants.models import Restaurant
+from .serializers import RestaurantSerializer
+from .permissions import IsOwnerOrSuperuser
+
 class RestaurantsViewSet(viewsets.ModelViewSet):
-    queryset = Restaurant.objects.all()
+    """
+    فقط سوپریوزر می‌تواند همه رستوران‌ها را ببیند.
+    کاربران عادی فقط رستوران خودشان را می‌بینند.
+    """
     serializer_class = RestaurantSerializer
-    search_fields = ["name",]
+    permission_classes = [IsOwnerOrSuperuser]
     filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # سوپریوزر می‌تونه همه رستوران‌ها رو ببینه
+        if user.is_superuser:
+            return Restaurant.objects.all()
+
+        # بقیه فقط رستوران خودشون رو می‌بینن
+        if user.restaurant:
+            return Restaurant.objects.filter(id=user.restaurant.id)
+        return Restaurant.objects.none()
+
+    def perform_create(self, serializer):
+        """
+        فقط سوپریوزر می‌تواند رستوران جدید ایجاد کند.
+        """
+        user = self.request.user
+        if not user.is_superuser:
+            raise serializers.ValidationError("Only superusers can create restaurants.")
+        serializer.save()
 
 
 
 class RestaurantProfileViewSet(viewsets.ModelViewSet):
     serializer_class = RestaurantProfileSerializer
-    search_fields = ["restaurant__name"]
     permission_classes = [IsOwnerOrSuperuser]
-    
+
     def get_queryset(self):
         user = self.request.user
         if user.is_superuser:
             return RestaurantProfile.objects.all()
-        return RestaurantProfile.objects.filter(restaurant__user=user)  # فرض بر اینکه فیلد user در مدل Restaurant هست
+        # فقط پروفایل مربوط به رستوران خودش
+        return RestaurantProfile.objects.filter(restaurant=user.restaurant)
 
     def perform_create(self, serializer):
         user = self.request.user
+        if not user.restaurant:
+            raise serializers.ValidationError("You must be assigned to a restaurant to create a profile.")
 
-        if not user.is_superuser:
-            # جلوگیری از ساخت چند پروفایل توسط یک کاربر
-            if RestaurantProfile.objects.filter(restaurant__user=user).exists():
-                raise serializers.ValidationError("You already have a restaurant profile.")
+        if RestaurantProfile.objects.filter(restaurant=user.restaurant).exists():
+            raise serializers.ValidationError("You already have a restaurant profile.")
 
-        serializer.save()
+        serializer.save(restaurant=user.restaurant)
