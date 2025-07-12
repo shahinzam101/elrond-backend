@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters, serializers
 from restaurants.models import Restaurant, RestaurantProfile
 from .serializers import RestaurantProfileSerializer, RestaurantSerializer
 from .permissions import IsOwnerOrSuperuser
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, filters
 from restaurants.models import Restaurant
 from .serializers import RestaurantSerializer
@@ -14,7 +14,7 @@ class RestaurantsViewSet(viewsets.ModelViewSet):
     کاربران عادی فقط رستوران خودشان را می‌بینند.
     """
     serializer_class = RestaurantSerializer
-    permission_classes = [IsOwnerOrSuperuser]
+    permission_classes = [IsAuthenticated,IsOwnerOrSuperuser]
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]
 
@@ -35,7 +35,7 @@ class RestaurantsViewSet(viewsets.ModelViewSet):
         فقط سوپریوزر می‌تواند رستوران جدید ایجاد کند.
         """
         user = self.request.user
-        if not user.is_superuser:
+        if not user.is_superuser :
             raise serializers.ValidationError("Only superusers can create restaurants.")
         serializer.save()
 
@@ -43,7 +43,7 @@ class RestaurantsViewSet(viewsets.ModelViewSet):
 
 class RestaurantProfileViewSet(viewsets.ModelViewSet):
     serializer_class = RestaurantProfileSerializer
-    permission_classes = [IsOwnerOrSuperuser]
+    permission_classes = [IsAuthenticated,IsOwnerOrSuperuser]
 
     def get_queryset(self):
         user = self.request.user

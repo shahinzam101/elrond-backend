@@ -13,6 +13,7 @@ class Category(models.Model):
         default=True,
         verbose_name="فعال"
     )
+    
 
     class Meta:
         verbose_name = "دسته‌بندی"

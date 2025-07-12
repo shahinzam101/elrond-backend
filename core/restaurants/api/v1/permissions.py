@@ -1,8 +1,9 @@
+from restaurants.models import Restaurant, RestaurantProfile
 from rest_framework import permissions
 
 class IsOwnerOrSuperuser(permissions.BasePermission):
     """
-    فقط سوپریوزر یا مالک رستوران پروفایل اجازه دسترسی دارد.
+    فقط سوپریوزر یا صاحب رستوران اجازه دارد.
     """
 
     def has_object_permission(self, request, view, obj):
@@ -11,5 +12,15 @@ class IsOwnerOrSuperuser(permissions.BasePermission):
         if user and user.is_superuser:
             return True
 
-        # فقط اجازه به پروفایل رستورانی که خود کاربر بهش متصل هست
-        return obj.restaurant == user.restaurant
+        if not hasattr(user, 'restaurant'):
+            return False
+
+        # اگر obj یک Restaurant باشه
+        if isinstance(obj, Restaurant):
+            return obj == user.restaurant
+
+        # اگر obj یک RestaurantProfile باشه
+        if isinstance(obj, RestaurantProfile):
+            return obj.restaurant == user.restaurant
+
+        return False
