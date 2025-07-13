@@ -32,6 +32,7 @@ urlpatterns = [
     path("restaurants/", include("restaurants.urls")),
     path("accounts/", include("accounts.api.v1.urls")),
     path("menu/", include("menu.urls")),
+    path("orders/", include("orders.urls")),
     #swagger links for the api documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # schema خام (JSON)
     path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
